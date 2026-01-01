@@ -38,7 +38,7 @@ def generate_chart(
     # 5️⃣ Calculate SIDEREAL ascendant
     ascendant_longitude = calculate_ascendant(jd, lat, lon)
 
-    # 6️⃣ Assign houses using degree-based Vedic logic
+    # 6️⃣ Assign houses using WHOLE SIGN VEDIC logic
     chart = assign_houses(chart, ascendant_longitude)
 
     return chart
@@ -61,8 +61,11 @@ if __name__ == "__main__":
     print("\n--- VEDIC BIRTH CHART ---\n")
     for planet, data in chart.items():
         print(
-            f"{planet:8} | "
-            f"Sign: {data['sign']:11} | "
+            f"{planet:10} | "
+            f"Sign: {data['sign']:10} | "
             f"Deg: {data['degree']:5} | "
-            f"House: {data['house']}"
+            f"House: {data['house']:2} | "
+            f"Nakshatra: {data.get('nakshatra','NA'):15} | "
+            f"Pada: {data.get('pada','NA')} | "
+            f"Lord: {data.get('nakshatra_lord','NA')}"
         )
