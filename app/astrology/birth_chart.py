@@ -1,23 +1,20 @@
-# app/astrology/birth_chart.py
-
 import swisseph as swe
 from app.astrology.nakshatra import get_nakshatra
 
-# --------------------------------------------------
-# CONSTANTS
-# --------------------------------------------------
+# 🔴 ABSOLUTELY REQUIRED
+swe.set_ephe_path(".")          # <-- CRITICAL FIX
+swe.set_sid_mode(swe.SIDM_LAHIRI)
 
-PLANETS = {
-    "Sun": swe.SUN,
-    "Moon": swe.MOON,
-    "Mars": swe.MARS,
-    "Mercury": swe.MERCURY,
-    "Jupiter": swe.JUPITER,
-    "Venus": swe.VENUS,
-    "Saturn": swe.SATURN,
-    "Rahu": swe.MEAN_NODE,
-    "Ketu": swe.MEAN_NODE,
-}
+PLANETS = [
+    ("Sun", swe.SUN),
+    ("Moon", swe.MOON),
+    ("Mars", swe.MARS),
+    ("Mercury", swe.MERCURY),
+    ("Jupiter", swe.JUPITER),
+    ("Venus", swe.VENUS),
+    ("Saturn", swe.SATURN),
+    ("Rahu", swe.MEAN_NODE),
+]
 
 SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer",
@@ -25,101 +22,68 @@ SIGNS = [
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ]
 
-# Vedic Rāśi Lords
-RASI_LORDS = {
-    "Aries": "Mars",
-    "Taurus": "Venus",
-    "Gemini": "Mercury",
-    "Cancer": "Moon",
-    "Leo": "Sun",
-    "Virgo": "Mercury",
-    "Libra": "Venus",
-    "Scorpio": "Mars",
-    "Sagittarius": "Jupiter",
-    "Capricorn": "Saturn",
-    "Aquarius": "Saturn",
-    "Pisces": "Jupiter",
-}
 
-# --------------------------------------------------
-# HELPERS
-# --------------------------------------------------
-
-def get_sign(longitude: float) -> str:
-    return SIGNS[int(longitude // 30)]
+def get_sign(lon):
+    return SIGNS[int(lon // 30)]
 
 
-def get_julian_day(utc_datetime):
+def get_julian_day(dt):
     return swe.julday(
-        utc_datetime.year,
-        utc_datetime.month,
-        utc_datetime.day,
-        utc_datetime.hour + utc_datetime.minute / 60.0
+        dt.year, dt.month, dt.day,
+        dt.hour + dt.minute / 60
     )
 
-# --------------------------------------------------
-# CORE CALCULATIONS
-# --------------------------------------------------
 
-def calculate_chart(utc_datetime):
-    """
-    Calculates sidereal (Lahiri) planetary longitudes.
-    Houses and nakshatras are assigned later.
-    """
-    swe.set_sid_mode(swe.SIDM_LAHIRI)
-
-    jd = get_julian_day(utc_datetime)
+def calculate_chart(utc_dt):
+    jd = get_julian_day(utc_dt)
     chart = {}
 
-    for planet, pid in PLANETS.items():
-        pos, _ = swe.calc_ut(jd, pid, swe.FLG_SIDEREAL)
+    rahu_lon = None
+
+    for name, pid in PLANETS:
+        pos, ret = swe.calc_ut(jd, pid, swe.FLG_SIDEREAL)
+
+        # 🔴 SAFETY CHECK
+        if ret < 0:
+            raise RuntimeError(f"Swiss Ephemeris failed for {name}")
+
         lon = pos[0] % 360
 
-        # Ketu is always opposite Rahu
-        if planet == "Ketu":
-            lon = (lon + 180) % 360
+        if name == "Rahu":
+            rahu_lon = lon
 
-        sign = get_sign(lon)
-
-        chart[planet] = {
+        chart[name] = {
             "longitude": round(lon, 2),
-            "sign": sign,
+            "sign": get_sign(lon),
             "degree": round(lon % 30, 2),
-            "rasi_lord": RASI_LORDS[sign],
         }
+
+    # Ketu derived AFTER Rahu
+    ketu_lon = (rahu_lon + 180) % 360
+    chart["Ketu"] = {
+        "longitude": round(ketu_lon, 2),
+        "sign": get_sign(ketu_lon),
+        "degree": round(ketu_lon % 30, 2),
+    }
 
     return chart
 
 
-def calculate_ascendant(jd, latitude, longitude):
-    """
-    Calculates sidereal ascendant using Lahiri ayanamsa.
-    """
-    houses, ascmc = swe.houses(jd, latitude, longitude, b'P')
-    tropical_asc = ascmc[0]
-
-    ayanamsa = swe.get_ayanamsa(jd)
-    sidereal_asc = (tropical_asc - ayanamsa) % 360
-
-    return sidereal_asc
+def calculate_ascendant(jd, lat, lon):
+    _, ascmc = swe.houses(jd, lat, lon, b'P')
+    asc = ascmc[0]
+    ayan = swe.get_ayanamsa(jd)
+    return (asc - ayan) % 360
 
 
-def assign_houses(chart, ascendant_longitude):
-    """
-    Assigns houses using WHOLE SIGN VEDIC logic
-    and adds Nakshatra + Pada.
-    """
-    asc_sign_index = int(ascendant_longitude // 30)
+def assign_houses(chart, asc_lon):
+    asc_sign = int(asc_lon // 30)
 
-    for planet, data in chart.items():
-        planet_sign_index = int(data["longitude"] // 30)
-
-        # Whole sign house system
-        house = (planet_sign_index - asc_sign_index) % 12 + 1
+    for body in chart:
+        data = chart[body]
+        body_sign = int(data["longitude"] // 30)
+        house = (body_sign - asc_sign) % 12 + 1
         data["house"] = house
-
-        # Nakshatra + Pada + Nakshatra Lord
-        nakshatra_data = get_nakshatra(data["longitude"])
-        data.update(nakshatra_data)
+        data.update(get_nakshatra(data["longitude"]))
 
     return chart
