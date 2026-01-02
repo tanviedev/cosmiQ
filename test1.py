@@ -1,6 +1,7 @@
 from app.astrology.birth_chart import *
 from app.astrology.nakshatra import get_nakshatra
 from app.utils.time_utils import to_utc
+from app.astrology.aspects import calculate_aspects
 
 
 if __name__ == "__main__":
@@ -35,3 +36,18 @@ if __name__ == "__main__":
             f"Pada: {d['pada']} | "
             f"Lord: {d['nakshatra_lord']}"
         )
+
+# 8️⃣ Calculate Graha Drishti
+aspects = calculate_aspects(chart)
+
+print("\n--- GRAHA DRISHTI (ASPECTS) ---\n")
+
+for planet, info in aspects.items():
+    houses = ", ".join(str(h) for h in info["aspect_houses"])
+    planets = ", ".join(info["aspect_planets"]) if info["aspect_planets"] else "None"
+
+    print(
+        f"{planet:10} | "
+        f"Aspects Houses: {houses:10} | "
+        f"Aspects Planets: {planets}"
+    )
