@@ -18,23 +18,6 @@ Provides a scaffold for AI/LLM-based natural language interpretation.
 
 The intent is to separate mathematical astrology from explanatory text, enabling interpretive layers (via fuzzy logic or LLM) to be added later.
 
-📦 Repository Structure
-cosmiQ/
-├── app/
-│   ├── astrology/
-│   │   ├── birth_chart.py        # Core chart math and houses
-│   │   ├── nakshatra.py          # Nakshatra and pada logic
-│   │   └── aspects.py            # Vedic drishti (planetary aspects)
-│   └── llm/                     # LLM/AI scaffolding (prompt builders, client)
-├── test1.py                     # Example: generate and display birth chart
-├── test2.py                     # Example: integrate with LLM interpreter
-├── requirements.txt             # Python dependencies
-├── .gitignore
-└── README.md                    # (You’re reading the improved version!)
-
-
-There are no descriptions or topics currently set in the repo.
-
 🚀 Features (Implemented)
 🪐 Chart Computation Engine
 
@@ -165,3 +148,4 @@ Check requirements.txt and file headers — no explicit LICENSE file is present.
 📌 Summary
 
 cosmiQ is a minimal but extendable Vedic astrology engine, correctly implementing sidereal calculations, whole-sign houses, nakshatras, and drishti logic. You can use it as a backend for astrology apps, AI chatbots, or research tools.
+
