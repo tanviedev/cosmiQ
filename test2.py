@@ -1,29 +1,18 @@
-from app.llm.astro_context import build_astro_context
-from app.llm.prompt_builder import build_prompt
-from app.llm.llm_client import get_astrology_reading
-from app.astrology.aspects import calculate_aspects
-from test1 import generate_chart
+# test2.py
 
+from app.astrology.drishti_engine import interpret_drishti
+from app.astrology.report_formatter import format_drishti_report
 
-chart = generate_chart(
-    name="Test User",
-    dob="2005-10-01",
-    time="15:57:00",
-    timezone="Asia/Kolkata",
-    latitude=19.0760,
-    longitude=72.8777
-)
+# Extracted from your existing output
+drishti_planet_map = {
+    "Sun": ["Mars"],
+    "Moon": ["Rahu"],
+    "Mars": ["Moon"],
+    "Jupiter": ["Rahu", "Saturn"],
+    "Saturn": ["Jupiter", "Venus"],
+    "Rahu": ["Jupiter", "Moon", "Venus"],
+    "Ketu": ["Mars"]
+}
 
-aspects = calculate_aspects(chart)
-
-astro_context = build_astro_context(chart, aspects)
-
-prompt = build_prompt(
-    astro_context,
-    user_question="Tell me about career and education"
-)
-
-reading = get_astrology_reading(prompt)
-
-print("\n--- ASTROLOGY READING ---\n")
-print(reading)
+interpretations = interpret_drishti(drishti_planet_map)
+format_drishti_report(interpretations)
