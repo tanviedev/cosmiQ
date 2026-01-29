@@ -1,51 +1,42 @@
-# app/astrology/vimshottariEngine/mahadasha.py
-
 from datetime import timedelta
-from .constants import DASHA_YEARS, VIMSHOTTARI_ORDER
-from .utils import get_nakshatra_index, get_dasha_lord
-
-NAKSHATRA_SPAN = 13 + 20/60  # 13°20′ = 13.333...
+from .constants import DASHA_YEARS, NAK_LEN
+from .utils import years_to_days, rotate_dasha
+from .antardasha import calculate_antardasha
 
 def calculate_vimshottari(chart, birth_dt):
     moon = chart["Moon"]
 
-    nak_name = moon["nakshatra"]
-    moon_deg = moon["degree"]
+    nakshatra_lord = moon["nakshatra_lord"]
+    moon_deg = moon["degree"]          # degree inside sign (0–30)
 
-    # 1️⃣ Nakshatra index
-    nak_index = get_nakshatra_index(nak_name)
+    # Degree inside nakshatra
+    deg_in_nak = moon_deg % NAK_LEN
+    frac_elapsed = deg_in_nak / NAK_LEN
 
-    # 2️⃣ Mahadasha lord
-    md_lord = get_dasha_lord(nak_index)
+    total_years = DASHA_YEARS[nakshatra_lord]
+    balance_years = total_years * (1 - frac_elapsed)
 
-    # 3️⃣ Balance of first Mahadasha
-    progressed = moon_deg / NAKSHATRA_SPAN
-    total_years = DASHA_YEARS[md_lord]
-    balance_years = total_years * (1 - progressed)
-
-    # 4️⃣ Build timeline
     dashas = []
-    current_date = birth_dt
+    current_start = birth_dt
 
-    start_idx = VIMSHOTTARI_ORDER.index(md_lord)
+    sequence = rotate_dasha(nakshatra_lord)
 
-    for i in range(9):
-        lord = VIMSHOTTARI_ORDER[(start_idx + i) % 9]
-        years = DASHA_YEARS[lord]
+    for i, lord in enumerate(sequence):
+        years = balance_years if i == 0 else DASHA_YEARS[lord]
+        days = years_to_days(years)
+        end = current_start + timedelta(days=days)
 
-        if i == 0:
-            years = balance_years
-
-        days = int(years * 365.25)
-        end_date = current_date + timedelta(days=days)
+        antardashas = calculate_antardasha(
+            lord, current_start, years
+        )
 
         dashas.append({
-            "lord": lord,
-            "start": current_date.date(),
-            "end": end_date.date(),
-            "years": round(years, 2)
+            "mahadasha": lord,
+            "start": current_start,
+            "end": end,
+            "antardashas": antardashas
         })
 
-        current_date = end_date
+        current_start = end
 
     return dashas
