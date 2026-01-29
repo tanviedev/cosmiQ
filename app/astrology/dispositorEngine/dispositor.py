@@ -1,21 +1,12 @@
-# app/astrology/dispositor.py
-
 from app.astrology.rasi_lords import RASI_LORDS
 
-
 def get_dispositor(planet_name, planet_data, chart):
-    """
-    Returns dispositor details for a given planet
-    """
-
     sign = planet_data["sign"]
     lord = RASI_LORDS.get(sign)
-
     if not lord or lord not in chart:
         return None
 
     lord_data = chart[lord]
-
     return {
         "dispositor": lord,
         "dispositor_sign": lord_data["sign"],
@@ -24,18 +15,13 @@ def get_dispositor(planet_name, planet_data, chart):
         "dispositor_strength_hint": _strength_hint(lord_data)
     }
 
-
 def _strength_hint(lord_data):
-    """
-    Very lightweight strength indicator (can be expanded later)
-    """
     house = lord_data["house"]
-
     if house in [1, 4, 7, 10]:
-        return "strong (kendra placement)"
+        return "strong (kendra)"
     elif house in [5, 9]:
-        return "supportive (trikona placement)"
+        return "supportive (trikona)"
     elif house in [6, 8, 12]:
-        return "challenged (dusthana placement)"
+        return "challenged (dusthana)"
     else:
         return "neutral"

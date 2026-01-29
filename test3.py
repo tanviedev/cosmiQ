@@ -6,10 +6,11 @@ from app.astrology.birth_chart import (
     get_sign
 )
 
-from app.astrology.chart_enricher import enrich_with_dispositors
+from app.astrology.dispositorEngine.chart_enricher import enrich_with_dispositors
 from app.utils.time_utils import to_utc
 from app.astrology.nakshatra import get_nakshatra
 from app.astrology.rasi_lords import RASI_LORDS
+
 
 def generate_chart(
     name,
@@ -19,22 +20,22 @@ def generate_chart(
     latitude,
     longitude
 ):
-    # 1️⃣ Convert local birth time → UTC
+    # 1️⃣ Convert local time → UTC
     utc_dt = to_utc(dob, time, timezone)
 
-    # 2️⃣ Planetary positions (sidereal)
+    # 2️⃣ Planetary positions
     chart = calculate_chart(utc_dt)
 
     # 3️⃣ Julian Day
     jd = get_julian_day(utc_dt)
 
-    # 4️⃣ Ascendant (sidereal)
+    # 4️⃣ Ascendant
     asc_lon = calculate_ascendant(jd, latitude, longitude)
 
-    # 5️⃣ Assign houses (whole sign Vedic)
+    # 5️⃣ Houses + nakshatra
     chart = assign_houses(chart, asc_lon)
 
-    # 6️⃣ Enrich with dispositor logic
+    # 6️⃣ Dispositor enrichment
     chart = enrich_with_dispositors(chart)
 
     # 7️⃣ Add Ascendant
@@ -69,25 +70,25 @@ if __name__ == "__main__":
 
     for planet, data in chart.items():
 
-       lord = RASI_LORDS.get(data["sign"], "—")
+        rasi_lord = RASI_LORDS.get(data["sign"], "—")
 
-       print(
-        f"{planet:10} | "
-        f"Sign: {data['sign']:11} | "
-        f"Deg: {data['degree']:5} | "
-        f"House: {data['house']:2} | "
-        f"Nakshatra: {data['nakshatra']:15} | "
-        f"Pada: {data['pada']} | "
-        f"Rāśi Lord: {lord}"
-       )
-
-       if "dispositor" in data:
-        d = data["dispositor"]
         print(
-            f"{'':10} | Dispositor → {d['dispositor']} | "
-            f"Sign: {d['dispositor_sign']} | "
-            f"House: {d['dispositor_house']} | "
-            f"Strength: {d['dispositor_strength_hint']}"
+            f"{planet:10} | "
+            f"Sign: {data['sign']:11} | "
+            f"Deg: {data['degree']:5} | "
+            f"House: {data['house']:2} | "
+            f"Nakshatra: {data['nakshatra']:15} | "
+            f"Pada: {data['pada']} | "
+            f"Rāśi Lord: {rasi_lord}"
         )
 
-       print()
+        if "dispositor" in data:
+            d = data["dispositor"]
+            print(
+                f"{'':10} | Dispositor → {d['dispositor']} | "
+                f"Sign: {d['dispositor_sign']} | "
+                f"House: {d['dispositor_house']} | "
+                f"Strength: {d['dispositor_strength_hint']}"
+            )
+
+        print()

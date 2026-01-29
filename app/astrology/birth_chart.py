@@ -1,8 +1,8 @@
 import swisseph as swe
 from app.astrology.nakshatra import get_nakshatra
 
-# 🔴 ABSOLUTELY REQUIRED
-swe.set_ephe_path(".")          # <-- CRITICAL FIX
+# Sets Swiss Ephemeris path (required)
+swe.set_ephe_path(".")
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 
 PLANETS = [
@@ -22,10 +22,8 @@ SIGNS = [
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ]
 
-
 def get_sign(lon):
     return SIGNS[int(lon // 30)]
-
 
 def get_julian_day(dt):
     return swe.julday(
@@ -33,22 +31,17 @@ def get_julian_day(dt):
         dt.hour + dt.minute / 60
     )
 
-
 def calculate_chart(utc_dt):
     jd = get_julian_day(utc_dt)
     chart = {}
-
     rahu_lon = None
 
     for name, pid in PLANETS:
         pos, ret = swe.calc_ut(jd, pid, swe.FLG_SIDEREAL)
-
-        # 🔴 SAFETY CHECK
         if ret < 0:
             raise RuntimeError(f"Swiss Ephemeris failed for {name}")
 
         lon = pos[0] % 360
-
         if name == "Rahu":
             rahu_lon = lon
 
@@ -58,7 +51,6 @@ def calculate_chart(utc_dt):
             "degree": round(lon % 30, 2),
         }
 
-    # Ketu derived AFTER Rahu
     ketu_lon = (rahu_lon + 180) % 360
     chart["Ketu"] = {
         "longitude": round(ketu_lon, 2),
@@ -68,13 +60,11 @@ def calculate_chart(utc_dt):
 
     return chart
 
-
 def calculate_ascendant(jd, lat, lon):
     _, ascmc = swe.houses(jd, lat, lon, b'P')
     asc = ascmc[0]
     ayan = swe.get_ayanamsa(jd)
     return (asc - ayan) % 360
-
 
 def assign_houses(chart, asc_lon):
     asc_sign = int(asc_lon // 30)
