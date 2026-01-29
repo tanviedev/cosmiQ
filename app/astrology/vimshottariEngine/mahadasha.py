@@ -1,34 +1,51 @@
+# app/astrology/vimshottariEngine/mahadasha.py
+
 from datetime import timedelta
-from app.astrology.vimshottariEngine.constants import DASHA_YEARS, VIMSHOTTARI_ORDER
-from app.astrology.vimshottariEngine.nakshatra_lords import NAKSHATRA_LORDS
+from .constants import DASHA_YEARS, VIMSHOTTARI_ORDER
+from .utils import get_nakshatra_index, get_dasha_lord
+
+NAKSHATRA_SPAN = 13 + 20/60  # 13°20′ = 13.333...
 
 def calculate_vimshottari(chart, birth_dt):
     moon = chart["Moon"]
-    nak_index = moon["nakshatra_index"]
-    nak_lord = NAKSHATRA_LORDS[nak_index]
-    completed = moon["nakshatra_progress"]
-    total_years = DASHA_YEARS[nak_lord]
-    remaining = total_years * (1 - completed)
 
-    timeline = []
-    current = birth_dt
-    idx = VIMSHOTTARI_ORDER.index(nak_lord)
+    nak_name = moon["nakshatra"]
+    moon_deg = moon["degree"]
 
-    timeline.append(_dasha_block(nak_lord,current,remaining))
-    current = timeline[-1]["end"]
+    # 1️⃣ Nakshatra index
+    nak_index = get_nakshatra_index(nak_name)
 
-    for i in range(1,len(VIMSHOTTARI_ORDER)):
-        lord = VIMSHOTTARI_ORDER[(idx+i)%9]
-        yrs = DASHA_YEARS[lord]
-        timeline.append(_dasha_block(lord,current,yrs))
-        current = timeline[-1]["end"]
+    # 2️⃣ Mahadasha lord
+    md_lord = get_dasha_lord(nak_index)
 
-    return timeline
+    # 3️⃣ Balance of first Mahadasha
+    progressed = moon_deg / NAKSHATRA_SPAN
+    total_years = DASHA_YEARS[md_lord]
+    balance_years = total_years * (1 - progressed)
 
-def _dasha_block(lord,start,years):
-    return {
-        "lord":lord,
-        "start":start,
-        "end":start+timedelta(days=int(years*365.25)),
-        "years":round(years,2)
-    }
+    # 4️⃣ Build timeline
+    dashas = []
+    current_date = birth_dt
+
+    start_idx = VIMSHOTTARI_ORDER.index(md_lord)
+
+    for i in range(9):
+        lord = VIMSHOTTARI_ORDER[(start_idx + i) % 9]
+        years = DASHA_YEARS[lord]
+
+        if i == 0:
+            years = balance_years
+
+        days = int(years * 365.25)
+        end_date = current_date + timedelta(days=days)
+
+        dashas.append({
+            "lord": lord,
+            "start": current_date.date(),
+            "end": end_date.date(),
+            "years": round(years, 2)
+        })
+
+        current_date = end_date
+
+    return dashas
