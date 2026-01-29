@@ -33,13 +33,13 @@ if __name__ == "__main__":
 
     for md in dashas:
         print(
-            f"{md['planet']} Mahadasha | "
+            f"{md['mahadasha']} Mahadasha | "
             f"{md['start'].date()} → {md['end'].date()}"
         )
 
         for ad in md["antardashas"]:
             print(
-                f"   └─ {ad['planet']} Antardasha | "
+                f"   └─ {ad['antardasha']} Antardasha | "
                 f"{ad['start'].date()} → {ad['end'].date()}"
             )
 
