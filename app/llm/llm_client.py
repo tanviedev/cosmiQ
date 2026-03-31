@@ -1,0 +1,22 @@
+import os
+from groq import Groq
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def call_llm(prompt: str) -> str:
+    response = client.chat.completions.create(
+        model="llama3-8b-8192",   # fast + free
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a precise Vedic astrology interpreter. Only interpret given data. No predictions."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.3
+    )
+
+    return response.choices[0].message.content
