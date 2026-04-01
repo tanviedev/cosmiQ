@@ -1,7 +1,7 @@
 from app.astrology.birth_chart import *
 from app.utils.time_utils import to_utc
-from dashboard.transits import get_transits
-from dashboard.transit_mapper import map_transits_to_houses
+from app.dashboard.transits import get_transits
+from app.dashboard.transit_mapper import map_transits_to_houses
 
 utc_dt = to_utc("2005-10-01", "15:57:00", "Asia/Kolkata")
 
