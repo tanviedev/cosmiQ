@@ -1,4 +1,4 @@
-from app.llm.intent_mapper import map_question_to_intent
+from app.llm.intent_detection.intent_classifier import classify_intent_llm
 from app.astrology.interpreter_engine.reason_builder import build_reasoning
 from app.llm.prompt_builder import build_prompt
 from app.llm.llm_client import call_llm
@@ -8,7 +8,7 @@ from app.llm.guardrails import is_valid_question
 def ask_cosmiq(question, chart, dashas):
 
     # 1️⃣ intent
-    intent = map_question_to_intent(question)
+    intent = classify_intent_llm(question)
 
     # 2️⃣ 🚨 GUARD CHECK
     valid, message = is_valid_question(intent, question)
