@@ -1,42 +1,22 @@
-from app.astrology.birth_chart import (
-    calculate_chart,
-    calculate_ascendant,
-    assign_houses,
-    get_julian_day,
-    get_sign
-)
-from app.astrology.nakshatra import get_nakshatra
-from app.utils.time_utils import to_utc
-from app.astrology.drishtiEngine.aspects import calculate_aspects
-
-# 🧠 NEW IMPORTS (LLM pipeline)
+from app.full_chart_pipeline import generate_full_chart
 from app.llm.interpreters.astro_agent import ask_cosmiq
 
 
 if __name__ == "__main__":
 
-    # 1️⃣ Convert birth time → UTC
-    utc_dt = to_utc("2005-10-01", "15:57:00", "Asia/Kolkata")
+    # ---------------- FULL PIPELINE ----------------
 
-    # 2️⃣ Planetary positions
-    chart = calculate_chart(utc_dt)
+    data = generate_full_chart(
+        dob="2005-10-01",
+        time="15:57:00",
+        timezone="Asia/Kolkata",
+        lat=19.0760,
+        lon=72.8777
+    )
 
-    # 3️⃣ Ascendant
-    jd = get_julian_day(utc_dt)
-    asc_lon = calculate_ascendant(jd, 19.0760, 72.8777)
-
-    # 4️⃣ Assign houses + nakshatra
-    chart = assign_houses(chart, asc_lon)
-
-    # 5️⃣ Add Ascendant
-    asc = {
-        "longitude": round(asc_lon, 2),
-        "sign": get_sign(asc_lon),
-        "degree": round(asc_lon % 30, 2),
-        "house": 1
-    }
-    asc.update(get_nakshatra(asc_lon))
-    chart["Ascendant"] = asc
+    chart = data["chart"]
+    drishti = data["drishti"]
+    dashas = data["dashas"]
 
     # ---------------- PRINT CHART ----------------
 
@@ -55,29 +35,27 @@ if __name__ == "__main__":
 
     # ---------------- DRISHTI ----------------
 
-    aspects = calculate_aspects(chart)
-
     print("\n--- GRAHA DRISHTI (ASPECTS) ---\n")
 
-    for planet, info in aspects.items():
-        houses = ", ".join(str(h) for h in info["aspect_houses"])
-        planets = ", ".join(info["aspect_planets"]) if info["aspect_planets"] else "None"
-
+    for line in drishti:
         print(
-            f"{planet:10} | "
-            f"Aspects Houses: {houses:10} | "
-            f"Aspects Planets: {planets}"
+            f"{line['from']} → {line['to']} | {line['meaning']}"
+        )
+
+    # ---------------- DASHAS ----------------
+
+    print("\n--- VIMSHOTTARI DASHA ---\n")
+
+    for md in dashas:
+        print(
+            f"{md['mahadasha']} | "
+            f"{md['start'].date()} → {md['end'].date()}"
         )
 
     # ---------------- CHATBOT ----------------
 
     print("\n--- cosmiQ AI CHAT ---\n")
     print("Type 'exit' to quit\n")
-
-    # ⚠️ For now: dummy dashas (until you plug real vimshottari)
-    dashas = [
-        {"planet": "Rahu"}   # temporary placeholder
-    ]
 
     while True:
         question = input("Ask: ")
@@ -88,6 +66,7 @@ if __name__ == "__main__":
 
         try:
             response = ask_cosmiq(question, chart, dashas)
+
             print("\n--- Answer ---\n")
             print(response)
             print("\n----------------\n")
