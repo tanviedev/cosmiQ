@@ -10,7 +10,7 @@ def ask_cosmiq(question, chart, dashas):
     intent = classify_intent_llm(question)
 
     # 3️⃣ reasoning
-    reasoning_list = build_reasoning(intent, chart, dashas)
+    reasoning_list = build_reasoning(intent, chart, dashas, aspects=None)
 
     # 🚨 If no reasoning → STOP
     if not reasoning_list:
