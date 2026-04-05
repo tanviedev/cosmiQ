@@ -1,6 +1,5 @@
 from app.llm.llm_client import call_llm
 
-
 ALLOWED_INTENTS = {
     "career",
     "relationship",

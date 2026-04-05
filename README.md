@@ -1,151 +1,240 @@
-📘 cosmiQ
+🌌 cosmiQ — AI-Powered Vedic Astrology System
 
-cosmiQ — A Python-based Vedic astrology engine and toolkit for computing birth charts with sidereal planetary positions, houses, nakshatras, padas, and aspects. This project lays a strong foundation for deeper astrological interpretation and AI-assisted readings.
+cosmiQ is a hybrid AI system that combines deterministic astrological engines with LLM-based interpretation to generate evidence-backed, non-hallucinated insights from a user’s birth chart.
 
-🧠 Overview
+Unlike typical astrology apps, cosmiQ is designed to be:
 
-This repository implements a core Vedic astrology computation engine:
+🔍 Transparent → Every answer is backed by explicit astrological reasoning
+🧠 Safe AI → LLMs do not make decisions, only explain engine outputs
+⚙️ Modular → Independent engines for chart, aspects, dashas, reasoning
+🚀 Extensible → Built for future agents, dashboards, and real-world use
+🧠 Core Philosophy
 
-Computes sidereal planetary positions (Lahiri ayanamsa).
+❗ LLMs should not think — they should explain
 
-Assigns whole-sign houses.
+cosmiQ strictly separates:
 
-Calculates nakshatra and pada for planets.
+🔹 Deterministic Engine (Truth Layer)
 
-Computes Vedic Drishti (aspects).
+Computes:
+Birth chart
+Houses
+Nakshatras
+Aspects (Drishti)
+Dispositors
+Vimshottari Dasha
 
-Provides a scaffold for AI/LLM-based natural language interpretation.
+Produces numerical + categorical facts
 
-The intent is to separate mathematical astrology from explanatory text, enabling interpretive layers (via fuzzy logic or LLM) to be added later.
+🔹 LLM Layer (Language Layer)
+Converts structured reasoning into human-readable answers
+Cannot hallucinate (strict prompt guardrails)
 
-🚀 Features (Implemented)
-🪐 Chart Computation Engine
 
-Sidereal planetary positions using Swiss Ephemeris (pyswisseph).
+🏗️ System Architecture
 
-Accurate handling of lunar nodes (Rahu/Ketu).
+User Question
+      ↓
+Intent Detection (LLM / rule-based)
+      ↓
+Reasoning Engine (deterministic)
+      ↓
+Decision Engine (YES / NO / WAIT)
+      ↓
+Prompt Builder
+      ↓
+LLM (formatting only)
+      ↓
+Final Answer (with proof)
 
-Whole-sign house assignments.
 
-Ascendant (Lagna) calculation.
+📂 Project Structure
 
-🌟 Nakshatra System
+cosmiQ/
+│
+├── app/
+│   ├── astrology/
+│   │   ├── birth_chart.py
+│   │   ├── nakshatra.py
+│   │   ├── rasi_lords.py
+│   │
+│   │   ├── drishtiEngine/
+│   │   │   ├── aspects.py
+│   │   │   ├── drishti_interpreter.py
+│   │   │   ├── report_formatter.py
+│   │
+│   │   ├── dispositorEngine/
+│   │   │   ├── chart_enricher.py
+│   │
+│   │   ├── vimshottariEngine/
+│   │   │   ├── mahadasha.py
+│   │
+│   │   ├── interpreter_engine/
+│   │   │   ├── reason_builder.py
+│   │
+│   ├── llm/
+│   │   ├── astro_agent.py
+│   │   ├── llm_client.py
+│   │   ├── prompt_builder.py
+│   │   ├── guardrails.py
+│   │   ├── intent_mapper.py
+│   │   ├── prompts/
+│   │   │   └── base.txt
+│   │
+│   ├── utils/
+│   │   ├── time_utils.py
+│
+├── test1.py  # Chart generation
+├── test2.py  # Drishti interpretation
+├── test4.py  # Vimshottari Dasha
+├── test_chat.py  # AI chatbot interface
 
-27 Nakshatras (star constellations).
 
-4 Padas each (3°20′ segments).
+⚙️ Features
 
-Nakshatra lord identification.
+🪐 1. Birth Chart Engine
+Calculates:
+Planetary positions
+Signs & degrees
+Houses (Placidus / Vedic style)
+Nakshatra + Pada
+Adds Ascendant dynamically
 
-These are computed for every planet and the ascendant.
+🔭 2. Graha Drishti (Aspects Engine)
+Computes:
+Planet-to-planet aspects
+House aspects
+Interprets meanings:
+e.g.
+Moon → Rahu → mental restlessness
 
-👁️ Vedic Drishti Module
+🔗 3. Dispositor Engine
+Tracks:
+Sign lord chain
+Adds strength hints:
+kendra, trikona, dusthana
 
-Classical aspects (as per Parāśari):
+⏳ 4. Vimshottari Dasha Engine
+Computes:
+Mahadasha sequence
+Timeline (start → end)
+Correctly aligned with Moon Nakshatra
 
-Planet	7th Aspect	Special Aspects
-Sun	Yes	None
-Moon	Yes	None
-Mars	Yes	4th & 8th houses
-Mercury	Yes	None
-Jupiter	Yes	5th & 9th houses
-Venus	Yes	None
-Saturn	Yes	3rd & 10th houses
-Rahu	Yes	5th & 9th houses (traditionally)
-Ketu	Yes	5th & 9th houses (traditionally)
+🧠 5. Reasoning Engine (Core Intelligence)
 
-This module computes which houses and planets each graha aspects based on the chart.
+Transforms chart into structured reasoning:
+Example:
+- Moon in Leo house 8 → emotional intensity
+- Rahu in Pisces house 3 → mental amplification
+- Current Mahadasha: Moon
 
-📥 Installation
+⚖️ 6. Decision Engine
 
-Clone the repository and install dependencies:
+Evaluates real-life questions:
 
-git clone https://github.com/tanviedev/cosmiQ.git
-cd cosmiQ
+{
+  "decision": "WAIT",
+  "confidence": "Medium",
+  "score": 1,
+  "reasons": [...]
+}
+
+Supports:
+
+Career timing
+Opportunities
+Emotional states
+
+🤖 7. LLM Layer (Guarded AI)
+Uses strict prompts
+No hallucination allowed
+Converts reasoning → explanation
+
+Example Output:
+
+1. Direct Answer:
+WAIT
+
+2. Explanation:
+- Current Mahadasha: Rahu → uncertainty
+- Saturn in 7th → delays
+- Venus in 10th → career support exists
+
+🚨 8. Guardrails
+
+Prevents:
+
+Unsupported questions
+Guessing
+Over-generalization
+
+If no data:
+
+Insufficient astrological basis to answer this.
+
+
+🧪 Running the Project
+1️⃣ Create Virtual Environment
 python -m venv venv
-venv\Scripts\activate          # Windows
+venv\Scripts\activate
+2️⃣ Install Dependencies
 pip install -r requirements.txt
-
-📌 Usage
-📊 Generate a Birth Chart
-
-Run:
-
+3️⃣ Run Core Modules
+🔹 Birth Chart
 python test1.py
+🔹 Drishti
+python test2.py
+🔹 Dasha
+python test4.py
+4️⃣ Run AI Chat
+python test_chat.py
+🔑 LLM Setup
 
+You can use:
 
-This prints:
-
-Sign
-
-Degree
-
-House
-
-Nakshatra
-
-Pada
-
-Nakshatra lord for each planet and Ascendant
-
-🤖 LLM Interpretation (Optional)
-
-test2.py shows how chart data can be fed into an LLM (like OpenAI’s API) for natural language reading. However, to use this you must set your API key:
-
-export OPENAI_API_KEY="your_key_here"
-
-
-or in Windows PowerShell:
-
+Option 1: OpenAI
 setx OPENAI_API_KEY "your_key_here"
+Option 2: Groq (Free)
 
-🚧 What’s Missing (Planned / Future)
+Update model in llm_client.py:
 
-The core engine works, but currently the repo does not implement:
+model="llama-3.1-8b-instant"
+💬 Example Queries
+What is influencing my overthinking?
+When should I apply for internships?
+How is my love life right now?
+🚀 Future Roadmap
+🔥 AI Enhancements
+LLM-based intent detection ✅ (in progress)
+Memory-based conversation
+Multi-turn reasoning
+📊 Data & Visualization
+Real-time transit tracking
+User-specific dashboards
+🌍 Product Vision
+Astrology assistant for decision support
+Not prediction → guided reasoning system
+⚠️ Disclaimer
 
-Dasha systems (Vimshottari Mahadasha/Antardasha)
+cosmiQ is designed as a decision-support system, not a deterministic predictor.
 
-Yoga detection
+It does not guarantee outcomes
+It provides structured astrological reasoning
+Final decisions remain with the user
+🏆 Key Highlights (For Recruiters)
+Built hybrid AI system (rule-based + LLM)
+Designed guardrailed LLM architecture
+Implemented modular reasoning pipelines
+Focused on interpretability & safety
+Avoided hallucination via strict prompt design
+👩‍💻 Author
 
-Predictive interpretation rules
+Tanvi Takle
 
-Frontend or API server
+⭐ Final Note
 
-Persistent storage or database
+This project is not just an astrology tool.
 
-These are natural candidates for the next phases of development.
+It is an experiment in building safe, interpretable AI systems where:
 
-🎯 Next Development Ideas
-
-Based on the current state, you could build:
-
-Vimshottari Dasha engine
-
-Yogas & Significators
-
-Fuzzy logic interpretation layer
-
-FastAPI backend & REST endpoints
-
-Interactive chart visualization
-
-🛠 Contributing
-
-Contributions are welcome! Suggested areas:
-
-Extend the LLM prompt templates
-
-Add yoga detection and interpretation
-
-Build an API or GUI interface
-
-Improve test coverage
-
-📜 License
-
-Check requirements.txt and file headers — no explicit LICENSE file is present. Consider adding a license (MIT, Apache, etc.).
-
-📌 Summary
-
-cosmiQ is a minimal but extendable Vedic astrology engine, correctly implementing sidereal calculations, whole-sign houses, nakshatras, and drishti logic. You can use it as a backend for astrology apps, AI chatbots, or research tools.
-
+Logic comes first, language comes second.

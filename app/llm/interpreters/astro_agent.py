@@ -4,7 +4,7 @@ from app.llm.prompt_builder import build_prompt
 from app.llm.llm_client import call_llm
 
 
-def ask_cosmiq(question, chart, dashas):
+def ask_cosmiq(question, chart, dashas, aspects=None):
 
     # 1️⃣ intent
     intent = classify_intent_llm(question)
@@ -17,7 +17,7 @@ def ask_cosmiq(question, chart, dashas):
         return "I don’t have enough astrological evidence to answer that."
 
     reasoning_text = "\n".join([f"- {r}" for r in reasoning_list])
-
+    
     # 4️⃣ prompt
     prompt = build_prompt("base.txt", {
         "question": question,
