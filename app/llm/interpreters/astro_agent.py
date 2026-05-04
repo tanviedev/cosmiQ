@@ -2,7 +2,7 @@ from app.llm.intent_detection.intent_classifier import classify_intent_llm
 from app.astrology.interpreter_engine.reason_builder import build_reasoning
 from app.llm.prompt_builder import build_prompt
 from app.llm.llm_client import call_llm
-
+from app.rag.rag_engine import retrieve_context   
 
 def ask_cosmiq(question, chart, dashas, aspects=None):
 
@@ -18,11 +18,16 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
 
     reasoning_text = "\n".join([f"- {r}" for r in reasoning_list])
     
+    # 🔥 3️⃣ RAG CONTEXT
+    rag_context = retrieve_context(question)
+    rag_text = "\n".join([f"- {r}" for r in rag_context])
+
+
     # 4️⃣ prompt
     prompt = build_prompt("base.txt", {
         "question": question,
-        "reasoning": reasoning_text
+        "reasoning": reasoning_text,
+        "rag_context": rag_text
     })
 
-    # 5️⃣ LLM
     return call_llm(prompt)
