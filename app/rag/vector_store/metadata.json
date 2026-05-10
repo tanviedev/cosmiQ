@@ -1,0 +1,281 @@
+[
+  {
+    "id": "moon_rahu_aspect",
+    "category": "aspect",
+    "from": "Moon",
+    "to": "Rahu",
+    "tags": [
+      "mental",
+      "anxiety"
+    ],
+    "meanings": [
+      "mental restlessness",
+      "emotional confusion",
+      "overthinking",
+      "emotional amplification",
+      "unconventional emotional patterns"
+    ]
+  },
+  {
+    "id": "mars_moon_aspect",
+    "category": "aspect",
+    "from": "Mars",
+    "to": "Moon",
+    "tags": [
+      "mental",
+      "emotions"
+    ],
+    "meanings": [
+      "emotional impulsiveness",
+      "reactive emotions",
+      "anger-driven decisions",
+      "high emotional energy"
+    ]
+  },
+  {
+    "id": "saturn_venus_aspect",
+    "category": "aspect",
+    "from": "Saturn",
+    "to": "Venus",
+    "tags": [
+      "relationship",
+      "karma"
+    ],
+    "meanings": [
+      "serious love",
+      "karmic relationships",
+      "delayed romance",
+      "emotional maturity",
+      "fear of vulnerability"
+    ]
+  },
+  {
+    "id": "rahu_venus_aspect",
+    "category": "aspect",
+    "from": "Rahu",
+    "to": "Venus",
+    "tags": [
+      "relationship",
+      "desire"
+    ],
+    "meanings": [
+      "intense attraction",
+      "obsessive desires",
+      "taboo relationships",
+      "emotional cravings",
+      "unusual relationship patterns"
+    ]
+  },
+  {
+    "id": "jupiter_saturn_aspect",
+    "category": "aspect",
+    "from": "Jupiter",
+    "to": "Saturn",
+    "tags": [
+      "career",
+      "wisdom"
+    ],
+    "meanings": [
+      "structured wisdom",
+      "disciplined learning",
+      "practical philosophy",
+      "slow but stable growth"
+    ]
+  },
+  {
+    "id": "venus_mahadasha",
+    "category": "dasha",
+    "planet": "Venus",
+    "tags": [
+      "relationships",
+      "career"
+    ],
+    "meanings": [
+      "focus on relationships",
+      "creative growth",
+      "beauty and harmony",
+      "social opportunities",
+      "artistic development"
+    ]
+  },
+  {
+    "id": "moon_mahadasha",
+    "category": "dasha",
+    "planet": "Moon",
+    "tags": [
+      "mental",
+      "emotions"
+    ],
+    "meanings": [
+      "emotional sensitivity",
+      "mental fluctuations",
+      "inner reflection",
+      "psychological growth"
+    ]
+  },
+  {
+    "id": "mars_mahadasha",
+    "category": "dasha",
+    "planet": "Mars",
+    "tags": [
+      "action",
+      "career"
+    ],
+    "meanings": [
+      "high energy",
+      "career action",
+      "competitive drive",
+      "assertive decisions",
+      "risk-taking"
+    ]
+  },
+  {
+    "id": "rahu_mahadasha",
+    "category": "dasha",
+    "planet": "Rahu",
+    "tags": [
+      "obsession",
+      "ambition"
+    ],
+    "meanings": [
+      "sudden changes",
+      "obsessive pursuits",
+      "unconventional paths",
+      "confusion with ambition",
+      "foreign influence"
+    ]
+  },
+  {
+    "id": "venus_strong_dispositor",
+    "category": "dispositor",
+    "planet": "Venus",
+    "strength": "strong",
+    "tags": [
+      "career",
+      "relationships"
+    ],
+    "meanings": [
+      "strong social intelligence",
+      "harmonious expression",
+      "supportive visibility",
+      "creative manifestation"
+    ]
+  },
+  {
+    "id": "mercury_supportive_dispositor",
+    "category": "dispositor",
+    "planet": "Mercury",
+    "strength": "supportive",
+    "tags": [
+      "communication",
+      "learning"
+    ],
+    "meanings": [
+      "analytical intelligence",
+      "communication ability",
+      "adaptability",
+      "learning strength"
+    ]
+  },
+  {
+    "id": "jupiter_10th",
+    "category": "placement",
+    "planet": "Jupiter",
+    "house": 10,
+    "tags": [
+      "career",
+      "leadership"
+    ],
+    "meanings": [
+      "career expansion",
+      "public recognition",
+      "mentorship",
+      "ethical leadership",
+      "guidance roles"
+    ]
+  },
+  {
+    "id": "venus_10th",
+    "category": "placement",
+    "planet": "Venus",
+    "house": 10,
+    "tags": [
+      "career",
+      "visibility"
+    ],
+    "meanings": [
+      "creative professions",
+      "branding ability",
+      "social charm",
+      "public image",
+      "artistic career"
+    ]
+  },
+  {
+    "id": "saturn_7th",
+    "category": "placement",
+    "planet": "Saturn",
+    "house": 7,
+    "tags": [
+      "relationship",
+      "delay"
+    ],
+    "meanings": [
+      "delayed partnerships",
+      "serious relationships",
+      "karmic bonds",
+      "mature commitment",
+      "external delays"
+    ]
+  },
+  {
+    "id": "moon_8th",
+    "category": "placement",
+    "planet": "Moon",
+    "house": 8,
+    "tags": [
+      "mental",
+      "emotions"
+    ],
+    "meanings": [
+      "deep emotions",
+      "psychological transformation",
+      "hidden fears",
+      "emotional intensity",
+      "inner vulnerability"
+    ]
+  },
+  {
+    "id": "rahu_3rd",
+    "category": "placement",
+    "planet": "Rahu",
+    "house": 3,
+    "tags": [
+      "communication",
+      "ambition"
+    ],
+    "meanings": [
+      "unconventional communication",
+      "bold self-expression",
+      "obsessive ambition",
+      "risk-taking",
+      "experimental mindset"
+    ]
+  },
+  {
+    "id": "mars_4th",
+    "category": "placement",
+    "planet": "Mars",
+    "house": 4,
+    "tags": [
+      "home",
+      "drive"
+    ],
+    "meanings": [
+      "strong inner drive",
+      "restlessness at home",
+      "assertive emotional base",
+      "competitive domestic environment"
+    ]
+  }
+]

@@ -1,3 +1,7 @@
+# ============================================
+# MAIN ROUTER
+# ============================================
+
 def build_reasoning(intent, chart, dashas, aspects=None):
 
     if intent in ["career", "career_decision"]:
@@ -9,134 +13,314 @@ def build_reasoning(intent, chart, dashas, aspects=None):
     elif intent == "mental":
         return build_mental_reasoning(chart, dashas, aspects)
 
-    return build_general_reasoning(chart, dashas)
-# ------------------ CAREER ------------------
+    return build_general_reasoning(chart, dashas, aspects)
+
+
+# ============================================
+# CAREER
+# ============================================
 
 def build_career_reasoning(chart, dashas, aspects):
+
     reasoning = []
 
-    # 🔹 1. Current Dasha (REAL LOGIC)
-    if dashas:
-        current = dashas[0]["mahadasha"]
-        reasoning.append(f"Current Mahadasha: {current}")
+    # ----------------------------------------
+    # 10TH HOUSE
+    # ----------------------------------------
 
-    # 🔹 2. 10th House (CAREER CORE)
     for planet, data in chart.items():
+
         if data.get("house") == 10:
-            reasoning.append(
-                f"{planet} in 10th house ({data['sign']}) → career focus, visibility"
-            )
 
-    # 🔹 3. Dispositors (CHAIN LOGIC)
+            reasoning.append({
+                "type": "placement",
+                "planet": planet,
+                "house": 10,
+                "sign": data["sign"],
+                "tags": ["career"]
+            })
+
+    # ----------------------------------------
+    # SATURN CAREER DELAY
+    # ----------------------------------------
+
+    if "Saturn" in chart:
+
+        saturn = chart["Saturn"]
+
+        reasoning.append({
+            "type": "placement",
+            "planet": "Saturn",
+            "house": saturn["house"],
+            "sign": saturn["sign"],
+            "tags": ["career"]
+        })
+
+    # ----------------------------------------
+    # DISPOSITORS
+    # ----------------------------------------
+
     for planet, data in chart.items():
-        if "dispositor" in data:
-            d = data["dispositor"]
-            reasoning.append(
-                f"{planet} dispositor → {d['dispositor']} in house {d['dispositor_house']} ({d['dispositor_strength_hint']})"
-            )
 
-    # 🔹 4. Saturn Delay Factor
-    if "Saturn" in chart and chart["Saturn"]["house"] == 7:
-        reasoning.append(
-            "Saturn in 7th → delays in external opportunities / partnerships"
-        )
+        if "dispositor" not in data:
+            continue
 
-    # 🔹 5. Aspects (VERY IMPORTANT 🔥)
+        d = data["dispositor"]
+
+        reasoning.append({
+            "type": "dispositor",
+            "planet": planet,
+            "dispositor": d["dispositor"],
+            "house": d["dispositor_house"],
+            "strength": d["dispositor_strength_hint"],
+            "tags": ["career"]
+        })
+
+    # ----------------------------------------
+    # ASPECTS
+    # ----------------------------------------
+
     if aspects:
+
         for asp in aspects:
-            if asp["to"] in ["Saturn", "Rahu"]:
-                reasoning.append(
-                    f"{asp['from']} aspects {asp['to']} → {asp['meaning']}"
-                )
+
+            if asp["to"] in ["Saturn", "Jupiter", "Venus"]:
+
+                reasoning.append({
+                    "type": "aspect",
+                    "from": asp["from"],
+                    "to": asp["to"],
+                    "meaning": asp["meaning"],
+                    "tags": ["career"]
+                })
+
+    # ----------------------------------------
+    # CURRENT DASHA
+    # ----------------------------------------
+
+    current = get_current_dasha(dashas)
+
+    if current:
+
+        reasoning.append({
+            "type": "dasha",
+            "planet": current,
+            "tags": ["career"]
+        })
 
     return reasoning
-# ------------------ RELATIONSHIP ------------------
+
+
+# ============================================
+# RELATIONSHIP
+# ============================================
 
 def build_relationship_reasoning(chart, dashas, aspects):
+
     reasoning = []
 
-    # 7th house
+    # ----------------------------------------
+    # 7TH HOUSE
+    # ----------------------------------------
+
     for planet, data in chart.items():
+
         if data.get("house") == 7:
-            reasoning.append(
-                f"{planet} in 7th house ({data['sign']}) → relationship focus"
-            )
 
-    # Venus
+            reasoning.append({
+                "type": "placement",
+                "planet": planet,
+                "house": 7,
+                "sign": data["sign"],
+                "tags": ["relationship"]
+            })
+
+    # ----------------------------------------
+    # VENUS
+    # ----------------------------------------
+
     if "Venus" in chart:
-        v = chart["Venus"]
-        reasoning.append(
-            f"Venus in {v['sign']} house {v['house']} → love style and attraction"
-        )
 
-    # Saturn (karmic delay)
-    if "Saturn" in chart and chart["Saturn"]["house"] == 7:
-        reasoning.append(
-            "Saturn in 7th → delayed or karmic relationships"
-        )
+        venus = chart["Venus"]
 
-    # Dasha
-    if dashas:
-        reasoning.append(f"Current Mahadasha: {dashas[0]['mahadasha']}")
+        reasoning.append({
+            "type": "placement",
+            "planet": "Venus",
+            "house": venus["house"],
+            "sign": venus["sign"],
+            "tags": ["relationship"]
+        })
 
-    # Aspects
+    # ----------------------------------------
+    # ASPECTS TO VENUS
+    # ----------------------------------------
+
     if aspects:
+
         for asp in aspects:
+
             if asp["to"] == "Venus":
-                reasoning.append(
-                    f"{asp['from']} influences Venus → {asp['meaning']}"
-                )
+
+                reasoning.append({
+                    "type": "aspect",
+                    "from": asp["from"],
+                    "to": "Venus",
+                    "meaning": asp["meaning"],
+                    "tags": ["relationship"]
+                })
+
+    # ----------------------------------------
+    # DASHA
+    # ----------------------------------------
+
+    current = get_current_dasha(dashas)
+
+    if current:
+
+        reasoning.append({
+            "type": "dasha",
+            "planet": current,
+            "tags": ["relationship"]
+        })
 
     return reasoning
 
 
-# ------------------ MENTAL ------------------
+# ============================================
+# MENTAL
+# ============================================
 
 def build_mental_reasoning(chart, dashas, aspects):
+
     reasoning = []
 
-    # Moon (core mind)
+    # ----------------------------------------
+    # MOON
+    # ----------------------------------------
+
     if "Moon" in chart:
-        m = chart["Moon"]
-        reasoning.append(
-            f"Moon in {m['sign']} house {m['house']} → emotional nature"
-        )
 
-    # Rahu (anxiety amplifier)
+        moon = chart["Moon"]
+
+        reasoning.append({
+            "type": "placement",
+            "planet": "Moon",
+            "house": moon["house"],
+            "sign": moon["sign"],
+            "tags": ["mental"]
+        })
+
+    # ----------------------------------------
+    # RAHU
+    # ----------------------------------------
+
     if "Rahu" in chart:
-        r = chart["Rahu"]
-        reasoning.append(
-            f"Rahu in {r['sign']} house {r['house']} → mental amplification, restlessness"
-        )
 
-    # Moon aspects
+        rahu = chart["Rahu"]
+
+        reasoning.append({
+            "type": "placement",
+            "planet": "Rahu",
+            "house": rahu["house"],
+            "sign": rahu["sign"],
+            "tags": ["mental"]
+        })
+
+    # ----------------------------------------
+    # ASPECTS TO MOON
+    # ----------------------------------------
+
     if aspects:
-        for asp in aspects:
-            if asp["to"] == "Moon":
-                reasoning.append(
-                    f"{asp['from']} affects Moon → {asp['meaning']}"
-                )
 
-    # Dasha influence
-    if dashas:
-        reasoning.append(f"Current Mahadasha: {dashas[0]['mahadasha']}")
+        for asp in aspects:
+
+            if asp["to"] == "Moon":
+
+                reasoning.append({
+                    "type": "aspect",
+                    "from": asp["from"],
+                    "to": "Moon",
+                    "meaning": asp["meaning"],
+                    "tags": ["mental"]
+                })
+
+    # ----------------------------------------
+    # DASHA
+    # ----------------------------------------
+
+    current = get_current_dasha(dashas)
+
+    if current:
+
+        reasoning.append({
+            "type": "dasha",
+            "planet": current,
+            "tags": ["mental"]
+        })
 
     return reasoning
 
-# ------------------ GENERAL ------------------
 
-def build_general_reasoning(chart, dashas):
+# ============================================
+# GENERAL
+# ============================================
+
+def build_general_reasoning(chart, dashas, aspects):
+
     reasoning = []
 
     for planet, data in chart.items():
-        reasoning.append(
-            f"{planet} in {data['sign']} house {data['house']}"
-        )
 
-    if dashas:
-        reasoning.append(f"Current Mahadasha: {dashas[0]['mahadasha']}")
+        reasoning.append({
+            "type": "placement",
+            "planet": planet,
+            "house": data["house"],
+            "sign": data["sign"],
+            "tags": ["general"]
+        })
+
+    if aspects:
+
+        for asp in aspects:
+
+            reasoning.append({
+                "type": "aspect",
+                "from": asp["from"],
+                "to": asp["to"],
+                "meaning": asp["meaning"],
+                "tags": ["general"]
+            })
+
+    current = get_current_dasha(dashas)
+
+    if current:
+
+        reasoning.append({
+            "type": "dasha",
+            "planet": current,
+            "tags": ["general"]
+        })
 
     return reasoning
 
-def format_reasoning(reasoning_list):
-    return "\n".join([f"- {r}" for r in reasoning_list])
+
+# ============================================
+# CURRENT DASHA
+# ============================================
+
+from datetime import datetime
+
+
+def get_current_dasha(dashas):
+
+    now = datetime.utcnow().replace(tzinfo=None)
+
+    for d in dashas:
+
+        start = d["start"].replace(tzinfo=None)
+        end = d["end"].replace(tzinfo=None)
+
+        if start <= now <= end:
+            return d["mahadasha"]
+
+    return None

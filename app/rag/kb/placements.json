@@ -1,0 +1,90 @@
+[
+  {
+    "id": "jupiter_10th",
+    "category": "placement",
+    "planet": "Jupiter",
+    "house": 10,
+    "tags": ["career", "leadership"],
+    "meanings": [
+      "career expansion",
+      "public recognition",
+      "mentorship",
+      "ethical leadership",
+      "guidance roles"
+    ]
+  },
+
+  {
+    "id": "venus_10th",
+    "category": "placement",
+    "planet": "Venus",
+    "house": 10,
+    "tags": ["career", "visibility"],
+    "meanings": [
+      "creative professions",
+      "branding ability",
+      "social charm",
+      "public image",
+      "artistic career"
+    ]
+  },
+
+  {
+    "id": "saturn_7th",
+    "category": "placement",
+    "planet": "Saturn",
+    "house": 7,
+    "tags": ["relationship", "delay"],
+    "meanings": [
+      "delayed partnerships",
+      "serious relationships",
+      "karmic bonds",
+      "mature commitment",
+      "external delays"
+    ]
+  },
+
+  {
+    "id": "moon_8th",
+    "category": "placement",
+    "planet": "Moon",
+    "house": 8,
+    "tags": ["mental", "emotions"],
+    "meanings": [
+      "deep emotions",
+      "psychological transformation",
+      "hidden fears",
+      "emotional intensity",
+      "inner vulnerability"
+    ]
+  },
+
+  {
+    "id": "rahu_3rd",
+    "category": "placement",
+    "planet": "Rahu",
+    "house": 3,
+    "tags": ["communication", "ambition"],
+    "meanings": [
+      "unconventional communication",
+      "bold self-expression",
+      "obsessive ambition",
+      "risk-taking",
+      "experimental mindset"
+    ]
+  },
+
+  {
+    "id": "mars_4th",
+    "category": "placement",
+    "planet": "Mars",
+    "house": 4,
+    "tags": ["home", "drive"],
+    "meanings": [
+      "strong inner drive",
+      "restlessness at home",
+      "assertive emotional base",
+      "competitive domestic environment"
+    ]
+  }
+]

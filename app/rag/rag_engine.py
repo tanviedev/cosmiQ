@@ -1,26 +1,86 @@
-# broken-RAG  
+import json
 from sentence_transformers import SentenceTransformer
-import faiss
 import numpy as np
+import faiss
+
+
+# ============================================
+# LOAD MODEL
+# ============================================
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Load your knowledge base
-documents = [
-    "Saturn in 7th house causes delays in relationships and partnerships",
-    "Jupiter in 10th house gives career growth and recognition",
-    "Rahu aspect on Moon creates mental instability and overthinking",
-    "Venus in Libra strengthens charm and public image",
-]
 
-embeddings = model.encode(documents)
+# ============================================
+# LOAD KNOWLEDGE BASE
+# ============================================
+
+with open("app/rag/kb/placements.json", "r") as f:
+    placements_kb = json.load(f)
+
+with open("app/rag/kb/aspects.json", "r") as f:
+    aspects_kb = json.load(f)
+
+
+KNOWLEDGE_BASE = placements_kb + aspects_kb
+
+
+# ============================================
+# BUILD SEARCH TEXTS
+# ============================================
+
+search_texts = []
+
+for item in KNOWLEDGE_BASE:
+
+    text = f"""
+    {item.get('planet', '')}
+    {item.get('house', '')}
+    {item.get('category', '')}
+    {' '.join(item.get('meanings', []))}
+    """
+
+    search_texts.append(text)
+
+
+# ============================================
+# EMBEDDINGS
+# ============================================
+
+embeddings = model.encode(search_texts)
+
 index = faiss.IndexFlatL2(len(embeddings[0]))
 index.add(np.array(embeddings))
 
 
-def retrieve_context(query, k=3):
-    q_emb = model.encode([query])
-    distances, indices = index.search(np.array(q_emb), k)
+# ============================================
+# SYMBOLIC FILTER
+# ============================================
 
-    results = [documents[i] for i in indices[0]]
-    return results
+def symbolic_filter(reasoning):
+
+    matches = []
+
+    for signal in reasoning:
+
+        for item in KNOWLEDGE_BASE:
+
+            # placement match
+            if signal["category"] == "placement":
+
+                if (
+                    item.get("planet") == signal.get("planet")
+                    and item.get("house") == signal.get("house")
+                ):
+                    matches.append(item)
+
+            # aspect match
+            elif signal["category"] == "aspect":
+
+                if (
+                    item.get("from") == signal.get("from")
+                    and item.get("to") == signal.get("to")
+                ):
+                    matches.append(item)
+
+    return matches

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "venus_strong_dispositor",
+    "category": "dispositor",
+    "planet": "Venus",
+    "strength": "strong",
+    "tags": ["career", "relationships"],
+    "meanings": [
+      "strong social intelligence",
+      "harmonious expression",
+      "supportive visibility",
+      "creative manifestation"
+    ]
+  },
+
+  {
+    "id": "mercury_supportive_dispositor",
+    "category": "dispositor",
+    "planet": "Mercury",
+    "strength": "supportive",
+    "tags": ["communication", "learning"],
+    "meanings": [
+      "analytical intelligence",
+      "communication ability",
+      "adaptability",
+      "learning strength"
+    ]
+  }
+]

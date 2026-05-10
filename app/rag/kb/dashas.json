@@ -1,0 +1,56 @@
+[
+  {
+    "id": "venus_mahadasha",
+    "category": "dasha",
+    "planet": "Venus",
+    "tags": ["relationships", "career"],
+    "meanings": [
+      "focus on relationships",
+      "creative growth",
+      "beauty and harmony",
+      "social opportunities",
+      "artistic development"
+    ]
+  },
+
+  {
+    "id": "moon_mahadasha",
+    "category": "dasha",
+    "planet": "Moon",
+    "tags": ["mental", "emotions"],
+    "meanings": [
+      "emotional sensitivity",
+      "mental fluctuations",
+      "inner reflection",
+      "psychological growth"
+    ]
+  },
+
+  {
+    "id": "mars_mahadasha",
+    "category": "dasha",
+    "planet": "Mars",
+    "tags": ["action", "career"],
+    "meanings": [
+      "high energy",
+      "career action",
+      "competitive drive",
+      "assertive decisions",
+      "risk-taking"
+    ]
+  },
+
+  {
+    "id": "rahu_mahadasha",
+    "category": "dasha",
+    "planet": "Rahu",
+    "tags": ["obsession", "ambition"],
+    "meanings": [
+      "sudden changes",
+      "obsessive pursuits",
+      "unconventional paths",
+      "confusion with ambition",
+      "foreign influence"
+    ]
+  }
+]

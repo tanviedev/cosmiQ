@@ -238,3 +238,26 @@ This project is not just an astrology tool.
 It is an experiment in building safe, interpretable AI systems where:
 
 Logic comes first, language comes second.
+
+User Question
+    ↓
+LLM Intent Detection
+    ↓
+Reason Builder
+(extract symbolic chart evidence)
+    ↓
+RAG Retrieval Engine
+(fetch matching astrological knowledge)
+    ↓
+LLM Interpreter
+(reason ONLY on retrieved evidence)
+    ↓
+Structured Astrological Response
+
+Your chart is:
+
+user-specific symbolic state
+
+Your KB is:
+
+universal astrology knowledge

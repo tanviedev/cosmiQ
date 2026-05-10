@@ -1,0 +1,74 @@
+[
+  {
+    "id": "moon_rahu_aspect",
+    "category": "aspect",
+    "from": "Moon",
+    "to": "Rahu",
+    "tags": ["mental", "anxiety"],
+    "meanings": [
+      "mental restlessness",
+      "emotional confusion",
+      "overthinking",
+      "emotional amplification",
+      "unconventional emotional patterns"
+    ]
+  },
+
+  {
+    "id": "mars_moon_aspect",
+    "category": "aspect",
+    "from": "Mars",
+    "to": "Moon",
+    "tags": ["mental", "emotions"],
+    "meanings": [
+      "emotional impulsiveness",
+      "reactive emotions",
+      "anger-driven decisions",
+      "high emotional energy"
+    ]
+  },
+
+  {
+    "id": "saturn_venus_aspect",
+    "category": "aspect",
+    "from": "Saturn",
+    "to": "Venus",
+    "tags": ["relationship", "karma"],
+    "meanings": [
+      "serious love",
+      "karmic relationships",
+      "delayed romance",
+      "emotional maturity",
+      "fear of vulnerability"
+    ]
+  },
+
+  {
+    "id": "rahu_venus_aspect",
+    "category": "aspect",
+    "from": "Rahu",
+    "to": "Venus",
+    "tags": ["relationship", "desire"],
+    "meanings": [
+      "intense attraction",
+      "obsessive desires",
+      "taboo relationships",
+      "emotional cravings",
+      "unusual relationship patterns"
+    ]
+  },
+
+  {
+    "id": "jupiter_saturn_aspect",
+    "category": "aspect",
+    "from": "Jupiter",
+    "to": "Saturn",
+    "tags": ["career", "wisdom"],
+    "meanings": [
+      "structured wisdom",
+      "disciplined learning",
+      "practical philosophy",
+      "slow but stable growth"
+    ]
+  }
+]
