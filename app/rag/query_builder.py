@@ -1,11 +1,26 @@
 def build_rag_query(intent, reasoning_list):
 
-    chunks = []
+    reasoning_texts = []
 
-    # intent
-    chunks.append(intent)
+    for item in reasoning_list:
 
-    # evidence
-    chunks.extend(reasoning_list)
+        # structured reasoning object
+        if isinstance(item, dict):
 
-    return " ".join(chunks)
+            if "text" in item:
+                reasoning_texts.append(item["text"])
+
+        # fallback plain string
+        elif isinstance(item, str):
+            reasoning_texts.append(item)
+
+    combined_reasoning = " ".join(reasoning_texts)
+
+    query = f"""
+    Intent: {intent}
+
+    Astrological Evidence:
+    {combined_reasoning}
+    """
+
+    return query.strip()

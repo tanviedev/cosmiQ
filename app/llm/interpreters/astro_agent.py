@@ -1,4 +1,6 @@
-from app.llm.intent_detection.intent_classifier import classify_intent_llm
+from app.llm.intent_detection.intent_classifier import (
+    classify_intent_llm
+)
 
 from app.astrology.interpreter_engine.reason_builder import (
     build_reasoning
@@ -32,15 +34,28 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
         aspects
     )
 
+    print("\nREASONING:")
+    print(reasoning_list)
+
     if not reasoning_list:
         return "Insufficient astrological evidence."
 
-    reasoning_text = "\n".join(
-        [f"- {r}" for r in reasoning_list]
-    )
+    # -----------------------------------
+    # 3️⃣ FORMAT REASONING TEXT
+    # -----------------------------------
+
+    reasoning_text = "\n".join([
+
+        f"- {r['text']}"
+        if isinstance(r, dict) and "text" in r
+
+        else f"- {str(r)}"
+
+        for r in reasoning_list
+    ])
 
     # -----------------------------------
-    # 3️⃣ BUILD RAG QUERY
+    # 4️⃣ BUILD RAG QUERY
     # -----------------------------------
 
     rag_query = build_rag_query(
@@ -52,7 +67,7 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
     print(rag_query)
 
     # -----------------------------------
-    # 4️⃣ RETRIEVE KNOWLEDGE
+    # 5️⃣ RETRIEVE KNOWLEDGE
     # -----------------------------------
 
     rag_results = search_knowledge_base(
@@ -60,23 +75,43 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
         top_k=5
     )
 
+    print("\nRAG RESULTS:")
+    print(rag_results)
+
+    # -----------------------------------
+    # 6️⃣ FORMAT RAG CONTEXT
+    # -----------------------------------
+
     rag_text = "\n".join([
-        f"- {r['text']}"
-        for r in rag_results
+
+        f"- {item['text']}"
+
+        for item in rag_results
+
+        if isinstance(item, dict)
+        and "text" in item
     ])
 
     # -----------------------------------
-    # 5️⃣ BUILD PROMPT
+    # 7️⃣ BUILD FINAL PROMPT
     # -----------------------------------
 
-    prompt = build_prompt("base.txt", {
-        "question": question,
-        "reasoning": reasoning_text,
-        "rag_context": rag_text
-    })
+    prompt = build_prompt(
+        "base.txt",
+        {
+            "question": question,
+            "reasoning": reasoning_text,
+            "rag_context": rag_text
+        }
+    )
+
+    print("\nFINAL PROMPT:")
+    print(prompt)
 
     # -----------------------------------
-    # 6️⃣ LLM INTERPRETATION
+    # 8️⃣ LLM INTERPRETATION
     # -----------------------------------
 
-    return call_llm(prompt)
+    response = call_llm(prompt)
+
+    return response
