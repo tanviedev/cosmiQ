@@ -6,14 +6,32 @@ from app.astrology.interpreter_engine.reason_builder import (
     build_reasoning
 )
 
-from app.rag.query_builder import build_rag_query
-from app.rag.retriever import search_knowledge_base
+from app.rag.query_builder import (
+    build_rag_query
+)
 
-from app.llm.prompt_builder import build_prompt
-from app.llm.llm_client import call_llm
+from app.rag.retriever import (
+    search_knowledge_base
+)
 
+from app.llm.prompt_builder import (
+    build_prompt
+)
 
-def ask_cosmiq(question, chart, dashas, aspects=None):
+from app.llm.llm_client import (
+    call_llm
+)
+
+# -----------------------------------
+# MAIN AGENT
+# -----------------------------------
+
+def ask_cosmiq(
+    question,
+    chart,
+    dashas,
+    aspects=None
+):
 
     # -----------------------------------
     # 1️⃣ INTENT DETECTION
@@ -24,7 +42,7 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
     print(f"\nDETECTED INTENT: {intent}")
 
     # -----------------------------------
-    # 2️⃣ STRUCTURED ASTRO REASONING
+    # 2️⃣ STRUCTURED REASONING
     # -----------------------------------
 
     reasoning_list = build_reasoning(
@@ -38,19 +56,17 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
     print(reasoning_list)
 
     if not reasoning_list:
-        return "Insufficient astrological evidence."
+
+        return (
+            "Insufficient astrological evidence."
+        )
 
     # -----------------------------------
-    # 3️⃣ FORMAT REASONING TEXT
+    # 3️⃣ FORMAT REASONING
     # -----------------------------------
 
     reasoning_text = "\n".join([
-
-        f"- {r['text']}"
-        if isinstance(r, dict) and "text" in r
-
-        else f"- {str(r)}"
-
+        f"- {str(r)}"
         for r in reasoning_list
     ])
 
@@ -71,7 +87,8 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
     # -----------------------------------
 
     rag_results = search_knowledge_base(
-        rag_query,
+        query=rag_query,
+        reasoning=reasoning_list,
         top_k=5
     )
 
@@ -79,21 +96,19 @@ def ask_cosmiq(question, chart, dashas, aspects=None):
     print(rag_results)
 
     # -----------------------------------
-    # 6️⃣ FORMAT RAG CONTEXT
+    # 6️⃣ FORMAT RAG
     # -----------------------------------
 
     rag_text = "\n".join([
 
-        f"- {item['text']}"
+        f"- {r['text']}"
 
-        for item in rag_results
+        for r in rag_results
 
-        if isinstance(item, dict)
-        and "text" in item
     ])
 
     # -----------------------------------
-    # 7️⃣ BUILD FINAL PROMPT
+    # 7️⃣ BUILD PROMPT
     # -----------------------------------
 
     prompt = build_prompt(
