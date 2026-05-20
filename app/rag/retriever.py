@@ -3,14 +3,25 @@ import faiss
 import numpy as np
 
 # -----------------------------------
-# LOAD MODEL
+# LOAD EMBEDDING MODEL
 # -----------------------------------
 
 from app.rag.model_loader import embedding_model as model
+
+# -----------------------------------
+# IMPORT SYMBOLIC FILTER
+# -----------------------------------
+
 from app.rag.symbolic_filter import symbolic_filter
 
 # -----------------------------------
-# LOAD INDEX
+# IMPORT SYMBOLIC SCORER
+# -----------------------------------
+
+from app.rag.scorer import calculate_symbolic_score
+
+# -----------------------------------
+# LOAD VECTOR INDEX
 # -----------------------------------
 
 index = faiss.read_index(
@@ -31,15 +42,17 @@ with open(
 
 # -----------------------------------
 # FORMATTER
+# Converts KB entries into text
+# for embeddings + LLM context
 # -----------------------------------
 
 def convert_to_text(entry):
 
     text_parts = []
 
-    # -------------------------
-    # PLACEMENTS
-    # -------------------------
+    # --------------------------------
+    # PLANETARY PLACEMENTS
+    # --------------------------------
 
     if entry.get("planet") and entry.get("house"):
 
@@ -47,9 +60,9 @@ def convert_to_text(entry):
             f"{entry['planet']} in {entry['house']}th house"
         )
 
-    # -------------------------
+    # --------------------------------
     # SIGN
-    # -------------------------
+    # --------------------------------
 
     if entry.get("sign"):
 
@@ -57,9 +70,9 @@ def convert_to_text(entry):
             f"in {entry['sign']}"
         )
 
-    # -------------------------
+    # --------------------------------
     # ASPECTS
-    # -------------------------
+    # --------------------------------
 
     if entry.get("from") and entry.get("to"):
 
@@ -67,9 +80,9 @@ def convert_to_text(entry):
             f"{entry['from']} aspecting {entry['to']}"
         )
 
-    # -------------------------
+    # --------------------------------
     # DASHA
-    # -------------------------
+    # --------------------------------
 
     if entry.get("category") == "dasha":
 
@@ -77,9 +90,9 @@ def convert_to_text(entry):
             f"{entry.get('planet')} Mahadasha"
         )
 
-    # -------------------------
+    # --------------------------------
     # TAGS
-    # -------------------------
+    # --------------------------------
 
     if entry.get("tags"):
 
@@ -87,9 +100,9 @@ def convert_to_text(entry):
             "Topics: " + ", ".join(entry["tags"])
         )
 
-    # -------------------------
+    # --------------------------------
     # MEANINGS
-    # -------------------------
+    # --------------------------------
 
     if entry.get("meanings"):
 
@@ -101,19 +114,43 @@ def convert_to_text(entry):
 
 # -----------------------------------
 # SEMANTIC SEARCH
+# Performs vector similarity search
 # -----------------------------------
 
-def semantic_search(documents, query, top_k=5):
+def semantic_search(
+    documents,
+    query,
+    reasoning,
+    top_k=5
+):
+
+    # --------------------------------
+    # SAFETY CHECK
+    # --------------------------------
 
     if not documents:
         return []
+
+    # --------------------------------
+    # CONVERT DOCS TO TEXT
+    # --------------------------------
 
     doc_texts = [
         convert_to_text(doc)
         for doc in documents
     ]
 
-    doc_embeddings = model.encode(doc_texts)
+    # --------------------------------
+    # CREATE DOCUMENT EMBEDDINGS
+    # --------------------------------
+
+    doc_embeddings = model.encode(
+        doc_texts
+    )
+
+    # --------------------------------
+    # CREATE TEMP FAISS INDEX
+    # --------------------------------
 
     temp_index = faiss.IndexFlatL2(
         len(doc_embeddings[0])
@@ -123,25 +160,76 @@ def semantic_search(documents, query, top_k=5):
         np.array(doc_embeddings)
     )
 
-    query_embedding = model.encode([query])
+    # --------------------------------
+    # ENCODE QUERY
+    # --------------------------------
+
+    query_embedding = model.encode(
+        [query]
+    )
+
+    # --------------------------------
+    # VECTOR SEARCH
+    # --------------------------------
 
     distances, indices = temp_index.search(
         np.array(query_embedding),
         min(top_k, len(documents))
     )
 
+    # --------------------------------
+    # BUILD RESULTS
+    # --------------------------------
+
     results = []
 
-    for idx in indices[0]:
+    for rank, idx in enumerate(indices[0]):
 
         item = documents[idx]
 
+        # ----------------------------
+        # SYMBOLIC SCORE
+        # ----------------------------
+
+        symbolic_score = calculate_symbolic_score(
+            reasoning,
+            item
+        )
+
+        # ----------------------------
+        # STORE RESULT
+        # ----------------------------
+
         results.append({
+
             "text": convert_to_text(item),
-            "metadata": item
+
+            "metadata": item,
+
+            "semantic_distance": float(
+                distances[0][rank]
+            ),
+
+            "symbolic_score": symbolic_score
         })
 
-    return results
+    # --------------------------------
+    # FINAL HYBRID RANKING
+    # --------------------------------
+
+    results = sorted(
+
+        results,
+
+        key=lambda x: (
+            x["symbolic_score"]
+            - x["semantic_distance"]
+        ),
+
+        reverse=True
+    )
+
+    return results[:top_k]
 
 # -----------------------------------
 # MAIN RETRIEVAL PIPELINE
@@ -153,27 +241,33 @@ def search_knowledge_base(
     top_k=5
 ):
 
-    # -----------------------------------
-    # 1️⃣ SYMBOLIC FILTER
-    # -----------------------------------
+    # --------------------------------
+    # STEP 1:
+    # SYMBOLIC FILTERING
+    # --------------------------------
 
     filtered_docs = symbolic_filter(
         metadata,
         reasoning
     )
 
-    # fallback safety
+    # --------------------------------
+    # FALLBACK SAFETY
+    # --------------------------------
 
     if not filtered_docs:
+
         filtered_docs = metadata
 
-    # -----------------------------------
-    # 2️⃣ SEMANTIC SEARCH
-    # -----------------------------------
+    # --------------------------------
+    # STEP 2:
+    # HYBRID SEMANTIC SEARCH
+    # --------------------------------
 
     results = semantic_search(
         filtered_docs,
         query,
+        reasoning,
         top_k
     )
 
